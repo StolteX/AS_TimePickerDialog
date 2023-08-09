@@ -4,6 +4,18 @@ ModulesStructureVersion=1
 Type=Class
 Version=8.3
 @EndOfDesignText@
+#If Documentation
+Updates
+V1.00
+	-Release
+V1.01
+	-Add get and set DialogYesText
+		-Default: OK
+	-Add get and set DialogNoText
+		-Default: CANCEL
+	-Add get and set DialogCancelText
+#End If
+
 Sub Class_Globals
 	
 	Type AS_TimePickerDialog_Theming(BackgroundColor As Int,ThumbColor As Int,ClockTextColor As Int,DialogButtonTextColor As Int,EditTextColor As Int,EditTextFocusColor As Int,TimePickerBackgroundColor As Int)
@@ -33,6 +45,9 @@ Sub Class_Globals
 	Private m_HapticFeedback As Boolean = True 'Ignore
 	Private m_Hour As Int
 	Private m_Minute As Int
+	Private m_DialogYesText As String
+	Private m_DialogNoText As String
+	Private m_DialogCancelText As String
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -42,6 +57,9 @@ Public Sub Initialize(Parent As B4XView)
 
 	m_MinuteSteps = 1
 	m_TimeFormat = getTimeFormat_24h
+
+	m_DialogYesText = "OK"
+	m_DialogNoText = "CANCEL"
 
 	g_Theming.Initialize
 	g_Theming.BackgroundColor = xui.Color_White
@@ -160,7 +178,7 @@ Public Sub ShowDialog As ResumableSub
 #End If
 
 
-	Wait For (Dialog.ShowCustom(xpnl_Background,"OK","CANCEL","")) Complete (Result As Int)
+	Wait For (Dialog.ShowCustom(xpnl_Background,m_DialogYesText,m_DialogNoText,m_DialogCancelText)) Complete (Result As Int)
 	Dim PickerDialogResponse As AS_TimePickerDialog_DialogResponse
 	PickerDialogResponse.Initialize
 	PickerDialogResponse.Result = Result
@@ -211,6 +229,30 @@ End Sub
 #End Region
 
 #Region Properties
+
+Public Sub setDialogCancelText(Text As String)
+	m_DialogCancelText = Text
+End Sub
+
+Public Sub getDialogCancelText As String
+	Return m_DialogCancelText
+End Sub
+'Default: CANCEL
+Public Sub setDialogNoText(Text As String)
+	m_DialogNoText = Text
+End Sub
+
+Public Sub getDialogNoText As String
+	Return m_DialogNoText
+End Sub
+'Default: OK
+Public Sub setDialogYesText(Text As String)
+	m_DialogYesText = Text
+End Sub
+
+Public Sub getDialogYesText As String
+	Return m_DialogYesText
+End Sub
 
 Public Sub getMinute As Int
 	Return m_Minute
@@ -442,12 +484,12 @@ jo.RunMethod("setClip", Array(shape))
 	jo.RunMethod("setClipToOutline", Array(True))
 	pnl.SetColorAndBorder(pnl.Color,0,0,radius)
 	#Else If B4I
-	Dim NaObj As NativeObject = pnl
-	Dim BorderWidth As Float = NaObj.GetField("layer").GetField("borderWidth").AsNumber
-	' *** Get border color ***
-	Dim noMe As NativeObject = Me
-	Dim BorderUIColor As Int = noMe.UIColorToColor (noMe.RunMethod ("borderColor:", Array (pnl)))
-	pnl.SetColorAndBorder(pnl.Color,BorderWidth,BorderUIColor,radius)
+'	Dim NaObj As NativeObject = pnl
+'	Dim BorderWidth As Float = NaObj.GetField("layer").GetField("borderWidth").AsNumber
+'	' *** Get border color ***
+'	Dim noMe As NativeObject = Me
+'	Dim BorderUIColor As Int = noMe.UIColorToColor (noMe.RunMethod ("borderColor:", Array (pnl)))
+'	pnl.SetColorAndBorder(pnl.Color,BorderWidth,BorderUIColor,radius)
 #end if
 End Sub
 
