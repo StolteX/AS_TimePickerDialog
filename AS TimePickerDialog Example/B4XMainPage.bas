@@ -43,15 +43,22 @@ Private Sub ShowDialogDarkMode
 	TimePickerDialog.Theming.TimePickerBackgroundColor = xui.Color_ARGB(255,32, 33, 37)
 	
 	TimePickerDialog.KeyboardEnabled = True
-	TimePickerDialog.TimeFormat = TimePickerDialog.TimeFormat_24h
+	TimePickerDialog.TimeFormat = TimePickerDialog.TimeFormat_12h
 	
+	
+'	TimePickerDialog.Minute = 15
+	'TimePickerDialog.PreDialogHeight = 300dip
 	Wait For (TimePickerDialog.ShowDialog) Complete (PickerDialogResponse As AS_TimePickerDialog_DialogResponse)
 	If PickerDialogResponse.Result = xui.DialogResponse_Positive Then
+		Log("is PM? " & PickerDialogResponse.isPm)
 		#If Debug
 		Log("Hour: " & PickerDialogResponse.Hour & " Minute: " & PickerDialogResponse.Minute)
+		Log(DateUtils.TicksToString(PickerDialogResponse.Date))
+		Log(PickerDialogResponse.isPm)
 		#Else
 		xui.MsgboxAsync("Hour: " & PickerDialogResponse.Hour & " Minute: " & PickerDialogResponse.Minute,"")
 		#End If
+		Log(DateUtils.TicksToString(DateUtils.SetDateAndTime(DateTime.GetYear(DateTime.Now),DateTime.GetMonth(DateTime.Now),DateTime.GetDayOfMonth(DateTime.Now),PickerDialogResponse.Hour,PickerDialogResponse.Minute,0)))
 	End If
 	
 End Sub

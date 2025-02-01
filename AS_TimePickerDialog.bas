@@ -14,12 +14,29 @@ V1.01
 	-Add get and set DialogNoText
 		-Default: CANCEL
 	-Add get and set DialogCancelText
+V1.02
+	-BugFixes
+	-Add SetDarkMode - Sets the dialog to DarkMode
+	-Add SetLightMode - Sets the dialog to LightMode
+V1.03
+	-Add Close - Closes the Dialog
+V1.04
+	-BugFix on TimeFormat_12h and PM times
+	-B4J - Buttons should now work
+V1.05
+	-Keyboard Type on the TextFields are now numbers
+V1.06
+	-Add set Date - You can now set the initial time with ticks
+	-BugFix on TimeFormat_12h
+	-Add isPm to AS_TimePickerDialog_DialogResponse
+	-Add Date to AS_TimePickerDialog_DialogResponse
+	-If you are using the TimeFormat 12h then the DialogResponse.Hour returns now 0-12 and you need to check with .isPm if it is am or pm
 #End If
 
 Sub Class_Globals
 	
 	Type AS_TimePickerDialog_Theming(BackgroundColor As Int,ThumbColor As Int,ClockTextColor As Int,DialogButtonTextColor As Int,EditTextColor As Int,EditTextFocusColor As Int,TimePickerBackgroundColor As Int)
-	Type AS_TimePickerDialog_DialogResponse(Result As Int,Hour As Int,Minute As Int)
+	Type AS_TimePickerDialog_DialogResponse(Result As Int,Hour As Int,Minute As Int,isPm As Boolean,Date As Long)
 	
 	Private g_Theming As AS_TimePickerDialog_Theming
 	
@@ -41,10 +58,10 @@ Sub Class_Globals
 	Private xpnl_AmPm As B4XView
 	Private xlbl_Am As B4XView
 	Private xlbl_Pm As B4XView
-	Private m_isPm As Boolean
 	Private m_HapticFeedback As Boolean = True 'Ignore
 	Private m_Hour As Int
 	Private m_Minute As Int
+	Private m_isPm As Boolean
 	Private m_DialogYesText As String
 	Private m_DialogNoText As String
 	Private m_DialogCancelText As String
@@ -62,13 +79,7 @@ Public Sub Initialize(Parent As B4XView)
 	m_DialogNoText = "CANCEL"
 
 	g_Theming.Initialize
-	g_Theming.BackgroundColor = xui.Color_White
-	g_Theming.ClockTextColor = xui.Color_Black
-	g_Theming.DialogButtonTextColor = xui.Color_ARGB(255,20,160,130)
-	g_Theming.ThumbColor = xui.Color_ARGB(255,20,160,130)
-	g_Theming.EditTextColor = xui.Color_Black
-	g_Theming.EditTextFocusColor = xui.Color_ARGB(255,20,160,130)
-	g_Theming.TimePickerBackgroundColor = xui.Color_ARGB(255,32, 33, 37)
+	SetLightMode
 
 	m_Hour = DateTime.GetHour(DateTime.Now)
 	m_Minute = DateTime.GetMinute(DateTime.Now)
@@ -83,6 +94,14 @@ Public Sub ShowDialog As ResumableSub
 	Dim xpnl_Background As B4XView = xui.CreatePanel("")
 	xpnl_Background.SetLayoutAnimated(0,0,0,Min(400dip,Dialog.mParent.Width - 40dip),500dip)
 	xpnl_Background.LoadLayout("frm_TimePickerDialog")
+	
+	#If B4I
+	xtf_Hour.As(TextField).KeyboardType = xtf_Hour.As(TextField).TYPE_NUMBER_PAD
+	xtf_Minutes.As(TextField).KeyboardType = xtf_Minutes.As(TextField).TYPE_NUMBER_PAD
+	#Else If B4A
+	xtf_Hour.As(EditText).InputType = xtf_Hour.As(EditText).INPUT_TYPE_NUMBERS
+	xtf_Minutes.As(EditText).InputType = xtf_Minutes.As(EditText).INPUT_TYPE_NUMBERS
+	#End If
 	
 	Dialog.BorderCornersRadius = 20dip
 	Dialog.BorderWidth = 0
@@ -135,7 +154,7 @@ Public Sub ShowDialog As ResumableSub
 		
 		xtf_Hour.Text = IIf(m_Hour > 12,NumberFormat(m_Hour-12,2,0),NumberFormat(m_Hour,2,0))
 		
-		Else
+	Else
 			
 		xtf_Hour.Width = IIf(xpnl_Background.Width < 400dip,(xpnl_Background.Width - 40dip - xlbl_Seperator.Width)/2, 160dip)
 		xtf_Minutes.Width = IIf(xpnl_Background.Width < 400dip,(xpnl_Background.Width - 40dip - xlbl_Seperator.Width)/2, 160dip)
@@ -160,8 +179,7 @@ Public Sub ShowDialog As ResumableSub
 	xlbl_Hour.Width = xtf_Hour.Width
 	xlbl_Minutes.Width = xtf_Hour.Width
 	
-	If m_Hour > 12 Then
-		m_isPm = True
+	If m_isPm Then
 		xlbl_Pm.Color = xui.Color_ARGB(40,GetARGB(g_Theming.EditTextFocusColor)(1),GetARGB(g_Theming.EditTextFocusColor)(2),GetARGB(g_Theming.EditTextFocusColor)(3))
 	Else
 		xlbl_Am.Color = xui.Color_ARGB(40,GetARGB(g_Theming.EditTextFocusColor)(1),GetARGB(g_Theming.EditTextFocusColor)(2),GetARGB(g_Theming.EditTextFocusColor)(3))
@@ -184,12 +202,18 @@ Public Sub ShowDialog As ResumableSub
 	PickerDialogResponse.Result = Result
 	PickerDialogResponse.Hour = AS_TimerPicker1.Hours
 	PickerDialogResponse.Minute = AS_TimerPicker1.Minutes
-	
+	PickerDialogResponse.isPm = m_isPm Or IIf(PickerDialogResponse.Hour > 11,True,False)
 	If m_TimeFormat = getTimeFormat_12h Then
-		If m_isPm Then PickerDialogResponse.Hour = PickerDialogResponse.Hour + 12
+		PickerDialogResponse.Date = DateUtils.SetDateAndTime(DateTime.GetYear(DateTime.now),DateTime.GetMonth(DateTime.now),DateTime.GetDayOfMonth(DateTime.now),IIf(m_isPm,PickerDialogResponse.Hour +12,PickerDialogResponse.Hour),PickerDialogResponse.Minute,0)
+	Else
+		PickerDialogResponse.Date = DateUtils.SetDateAndTime(DateTime.GetYear(DateTime.now),DateTime.GetMonth(DateTime.now),DateTime.GetDayOfMonth(DateTime.now),PickerDialogResponse.Hour,PickerDialogResponse.Minute,0)
 	End If
-	
 	Return PickerDialogResponse
+End Sub
+
+'Closes the dialog
+Public Sub Close
+	Dialog.Close(xui.DialogResponse_Cancel)
 End Sub
 
 Private Sub ColorChange(isHour As Boolean)
@@ -216,6 +240,28 @@ Private Sub ColorChange(isHour As Boolean)
 	
 End Sub
 
+Public Sub SetDarkMode As AS_TimePickerDialog_Theming
+	g_Theming.BackgroundColor = xui.Color_ARGB(255,19, 20, 22)
+	g_Theming.ClockTextColor = xui.Color_White
+	g_Theming.DialogButtonTextColor = xui.Color_ARGB(255,20,160,130)
+	g_Theming.EditTextColor = xui.Color_White
+	g_Theming.EditTextFocusColor = xui.Color_ARGB(255,20,160,130)
+	g_Theming.ThumbColor = xui.Color_ARGB(255,20,160,130)
+	g_Theming.TimePickerBackgroundColor = xui.Color_ARGB(255,32, 33, 37)
+	Return g_Theming
+End Sub
+
+Public Sub SetLightMode As AS_TimePickerDialog_Theming
+	g_Theming.BackgroundColor = xui.Color_White
+	g_Theming.ClockTextColor = xui.Color_Black
+	g_Theming.DialogButtonTextColor = xui.Color_ARGB(255,20,160,130)
+	g_Theming.EditTextColor = xui.Color_Black
+	g_Theming.EditTextFocusColor = xui.Color_ARGB(255,20,160,130)
+	g_Theming.ThumbColor = xui.Color_ARGB(255,20,160,130)
+	g_Theming.TimePickerBackgroundColor = xui.Color_ARGB(255,245,246,247)
+	Return g_Theming
+End Sub
+
 #Region Enums
 
 Public Sub getTimeFormat_12h As String
@@ -229,6 +275,16 @@ End Sub
 #End Region
 
 #Region Properties
+
+Public Sub setDate(Date As Long)
+	m_Hour = DateTime.GetHour(Date)
+	m_Minute = DateTime.GetMinute(Date)
+	m_isPm = IIf(m_Hour >= 12,True,False)
+End Sub
+
+Public Sub setisPm(isPm As Boolean)
+	m_isPm = isPm
+End Sub
 
 Public Sub setDialogCancelText(Text As String)
 	m_DialogCancelText = Text
@@ -429,26 +485,46 @@ Private Sub AS_TimerPicker1_SelectedHour (Hour As Int)
 	ColorChange(False)
 End Sub
 
+#If B4J
+Private Sub xlbl_Am_MouseClicked (EventData As MouseEvent)
+#Else
 Private Sub xlbl_Am_Click
+#End If
 	m_isPm = False
-	xlbl_Hour_Click
+	HourClick
 	xlbl_Am.Color = xui.Color_ARGB(40,GetARGB(g_Theming.EditTextFocusColor)(1),GetARGB(g_Theming.EditTextFocusColor)(2),GetARGB(g_Theming.EditTextFocusColor)(3))
 	xlbl_Pm.Color = g_Theming.TimePickerBackgroundColor
 End Sub
 
+#If B4J
+Private Sub xlbl_Pm_MouseClicked (EventData As MouseEvent)
+#Else
 Private Sub xlbl_Pm_Click
+#End If
 	m_isPm = True
-	xlbl_Hour_Click
+	HourClick
 	xlbl_Pm.Color = xui.Color_ARGB(40,GetARGB(g_Theming.EditTextFocusColor)(1),GetARGB(g_Theming.EditTextFocusColor)(2),GetARGB(g_Theming.EditTextFocusColor)(3))
 	xlbl_Am.Color = g_Theming.TimePickerBackgroundColor
 End Sub
 
-Private Sub xlbl_Hour_Click
+Private Sub HourClick
 	ColorChange(True)
 	AS_TimerPicker1.SmoothModeChange(AS_TimerPicker1.CurrentMode_HourSelection)
 End Sub
 
+#If B4J
+Private Sub xlbl_Hour_MouseClicked (EventData As MouseEvent)
+#Else
+Private Sub xlbl_Hour_Click
+#End If
+	HourClick
+End Sub
+
+#If B4J
+Private Sub xlbl_Minutes_MouseClicked (EventData As MouseEvent)
+#Else
 Private Sub xlbl_Minutes_Click
+#End If
 	ColorChange(False)
 	AS_TimerPicker1.SmoothModeChange(AS_TimerPicker1.CurrentMode_MinuteSelection)
 End Sub

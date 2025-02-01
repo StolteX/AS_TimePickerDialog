@@ -9,17 +9,19 @@ Library1=b4xpages
 Library2=jcore
 Library3=jfx
 Library4=xui views
-Library5=as_timepicker
 Module1=|relative|..\..\AS_TimePickerDialog
-Module2=|relative|..\B4XMainPage
+Module2=|relative|..\..\..\AS TimePicker\AS_TimerPicker
+Module3=|relative|..\B4XMainPage
 NumberOfFiles=2
-NumberOfLibraries=5
-NumberOfModules=2
-Version=9.8
+NumberOfLibraries=4
+NumberOfModules=3
+Version=10
 @EndOfDesignText@
 #Region Project Attributes 
-	#MainFormWidth: 600
+'	#MainFormWidth: 600
 	#MainFormHeight: 600 
+	#MainFormWidth: 600
+	'#MainFormHeight: 400 
 #End Region
 
 Sub Process_Globals

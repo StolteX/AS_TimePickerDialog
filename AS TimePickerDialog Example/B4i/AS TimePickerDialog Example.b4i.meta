@@ -7,6 +7,6 @@ ModuleBreakpoints2=
 ModuleClosedNodes0=4
 ModuleClosedNodes1=
 ModuleClosedNodes2=1
-NavigationStack=AS_TimePickerDialog,xtf_Hour_TextChanged,186,6,Visual Designer,frm_TimePickerDialog.bil,-100,2,AS_TimePickerDialog,xtf_Hour_EndEdit,324,6,AS_TimePickerDialog,xlbl_Minutes_Click,212,0,AS_TimePickerDialog,xtf_Hour_EnterPressed,329,3,AS_TimePickerDialog,setKeyboardEnabled,285,0,B4XMainPage,ShowDialogLightMode,65,0,AS_TimePickerDialog,Class_Globals,26,6
+NavigationStack=AS_TimePickerDialog,setisPm,275,2,AS_TimePickerDialog,getTimeFormat_24h,265,0,AS_TimePickerDialog,setDate,270,6,AS_TimePickerDialog,xlbl_Am_Click,486,1,AS_TimePickerDialog,xlbl_Pm_Click,497,1,AS_TimePickerDialog,ShowDialog,199,6,B4XMainPage,ShowDialogDarkMode,38,6,AS_TimePickerDialog,Class_Globals,29,6,AS_TimePickerDialog,AS_TimerPicker1_SelectedMinuteChanged,466,0,AS_TimePickerDialog,AS_TimerPicker1_SelectedHourChanged,458,0,AS_TimePickerDialog,xtf_Minutes_FocusChanged,450,0
 SelectedBuild=0
 VisibleModules=2,1
